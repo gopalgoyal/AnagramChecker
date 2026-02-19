@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>11</LangVersion>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="SpecFlow.NUnit" Version="4.0.31-beta" />
+    <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="4.0.31-beta" PrivateAssets="All" />
+    <PackageReference Include="NUnit" Version="3.13.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="Serilog" Version="2.12.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+    <PackageReference Include="RestSharp" Version="108.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="specflow.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Exclude auxiliary tooling/scripts from project compilation -->
+    <Compile Remove="tools\\**\\*.cs" />
+    <None Remove="tools\\**" />
+    <!-- Exclude web app sources from the test project build -->
+    <Compile Remove="AnagramWebValidator\\**\\*.cs" />
+    <None Remove="AnagramWebValidator\\**" />
+  </ItemGroup>
+</Project>
