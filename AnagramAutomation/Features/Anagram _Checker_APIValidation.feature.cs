@@ -20,23 +20,25 @@ namespace AnagramAutomation.Features
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "4.0.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [NUnit.Framework.TestFixtureAttribute()]
-    [NUnit.Framework.DescriptionAttribute("Anagram Checker")]
-    public partial class AnagramCheckerFeature
+    [NUnit.Framework.DescriptionAttribute("Anagram Checker API Validation")]
+    [NUnit.Framework.CategoryAttribute("api")]
+    public partial class AnagramCheckerAPIValidationFeature
     {
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
         
-        private static string[] featureTags = ((string[])(null));
+        private static string[] featureTags = new string[] {
+                "api"};
         
-#line 1 "Anagram_Checker.feature"
+#line 1 "Anagram _Checker_APIValidation.feature"
 #line hidden
         
         [NUnit.Framework.OneTimeSetUpAttribute()]
         public virtual async System.Threading.Tasks.Task FeatureSetupAsync()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunnerForAssembly(null, NUnit.Framework.TestContext.CurrentContext.WorkerId);
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "Anagram Checker", "  As a user\r\n  I want to check if two strings are anagrams\r\n  So that I can verif" +
-                    "y their relationship", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "Anagram Checker API Validation", "    As a user\r\n    I want to validate if two strings are anagrams via API\r\n    So" +
+                    " that I can verify API behavior", ProgrammingLanguage.CSharp, featureTags);
             await testRunner.OnFeatureStartAsync(featureInfo);
         }
         
@@ -75,7 +77,7 @@ namespace AnagramAutomation.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Check if two strings are anagrams")]
+        [NUnit.Framework.DescriptionAttribute("Validate via AnagramAPI if two strings are anagrams")]
         [NUnit.Framework.CategoryAttribute("anagram")]
         [NUnit.Framework.TestCaseAttribute("listen", "silent", "true", null)]
         [NUnit.Framework.TestCaseAttribute("hello", "world", "false", null)]
@@ -85,7 +87,7 @@ namespace AnagramAutomation.Features
         [NUnit.Framework.TestCaseAttribute("eleven plus two", "twelve plus one", "true", null)]
         [NUnit.Framework.TestCaseAttribute("apple", "paple", "true", null)]
         [NUnit.Framework.TestCaseAttribute("rat", "car", "false", null)]
-        public async System.Threading.Tasks.Task CheckIfTwoStringsAreAnagrams(string input1, string input2, string output, string[] exampleTags)
+        public async System.Threading.Tasks.Task ValidateViaAnagramAPIIfTwoStringsAreAnagrams(string input1, string input2, string output, string[] exampleTags)
         {
             string[] @__tags = new string[] {
                     "anagram"};
@@ -98,9 +100,9 @@ namespace AnagramAutomation.Features
             argumentsOfScenario.Add("input1", input1);
             argumentsOfScenario.Add("input2", input2);
             argumentsOfScenario.Add("output", output);
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Check if two strings are anagrams", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 9
-  this.ScenarioInitialize(scenarioInfo);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Validate via AnagramAPI if two strings are anagrams", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 8
+    this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -109,14 +111,14 @@ namespace AnagramAutomation.Features
             else
             {
                 await this.ScenarioStartAsync();
+#line 9
+        await testRunner.GivenAsync("a running Anagram API at \"http://localhost:5000\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
 #line 10
-    await testRunner.GivenAsync(string.Format("the input strings \"{0}\" and \"{1}\"", input1, input2), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+        await testRunner.WhenAsync(string.Format("I POST to \"/api/anagram\" with payload strings \"{0}\" and \"{1}\"", input1, input2), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 11
-    await testRunner.WhenAsync("I check if they are anagrams", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 12
-    await testRunner.ThenAsync(string.Format("the result should be \"{0}\"", output), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+        await testRunner.ThenAsync(string.Format("the API response field \"isAnagram\" should be \"{0}\"", output), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

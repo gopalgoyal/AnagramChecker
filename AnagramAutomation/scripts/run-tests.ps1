@@ -1,3 +1,7 @@
+param(
+    [string]$Tag
+)
+
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot   # AnagramAutomation/
 $workspace = Split-Path -Parent $root       # repo root
@@ -48,7 +52,21 @@ try {
     if (Test-Path $trxOut) {
         Remove-Item -Path $trxOut -Force -ErrorAction SilentlyContinue
     }
-    dotnet test $testProject --logger "trx;LogFileName=anagram-results.trx"
+
+    $dotnetArgs = @(
+        "test"
+        $testProject
+        "--logger"
+        "trx;LogFileName=anagram-results.trx"
+    )
+
+    if ($Tag -and $Tag.Trim().Length -gt 0) {
+        $normalizedTag = $Tag.Trim().TrimStart('@')
+        Write-Host "  Applying tag filter: @$normalizedTag" -ForegroundColor Yellow
+        $dotnetArgs += @("--filter", "TestCategory=$normalizedTag")
+    }
+
+    & dotnet @dotnetArgs
     $testExit = $LASTEXITCODE
 
 } finally {

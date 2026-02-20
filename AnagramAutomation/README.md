@@ -13,10 +13,21 @@ powershell -ExecutionPolicy Bypass -File AnagramAutomation/scripts/run-tests.ps1
 This automatically:
 1. Kills any leftover process on port 5000
 2. Starts the AnagramWebValidator service and waits until it responds
-3. Runs all 9 tests
+3. Runs tests (all by default)
 4. Stops the AnagramWebValidator service
 5. Generates the HTML report
 6. Opens the report in your browser
+
+### Run by tag (optional)
+
+From the **workspace root**:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File AnagramAutomation/scripts/run-tests.ps1 -Tag anagram
+powershell -ExecutionPolicy Bypass -File AnagramAutomation/scripts/run-tests.ps1 -Tag api
+```
+
+You can pass tag names with or without `@` (for example `api` or `@api`).
 
 ### Option 2 — VS Code keyboard shortcut
 
@@ -53,7 +64,8 @@ The report shows total / passed / failed / skipped counts, a pass-rate progress 
 ```
 AnagramAutomation/
 ├── Features/
-│   └── Anagram_Checker.feature      <- Define tests here (plain English)
+│   ├── Anagram_Checker.feature                  <- `@anagram` scenario outline (logic)
+│   └── Anagram _Checker_APIValidation.feature   <- `@api` + `@anagram` scenario outline (API)
 ├── Steps/
 │   ├── AnagramSteps.cs              <- Runs the anagram logic tests
 │   └── ApiSteps.cs                  <- Runs the API tests
@@ -79,7 +91,7 @@ AnagramAutomation/
 
 ## Adding a New Test
 
-Open `Features/Anagram_Checker.feature` and add a row to the Examples table:
+Open either feature file and add a row to the Examples table:
 
 ```gherkin
 Examples:

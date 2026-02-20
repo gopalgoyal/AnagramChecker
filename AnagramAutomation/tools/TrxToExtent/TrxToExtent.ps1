@@ -23,6 +23,39 @@ $scenarioOrder = @(
   'Validate via API if two strings are anagrams'
 )
 
+function ConvertTo-Seconds([string]$value) {
+  if (-not $value) { return $null }
+  try {
+    $ts = [TimeSpan]::Parse($value)
+    return [double]$ts.TotalSeconds
+  }
+  catch {
+    return $null
+  }
+}
+
+function Format-Duration([double]$seconds) {
+  if ($null -eq $seconds) { return 'N/A' }
+  if ($seconds -lt 60) {
+    return ('{0:0.00}s' -f [math]::Max(0, $seconds))
+  }
+  $ts = [TimeSpan]::FromSeconds([math]::Max(0, $seconds))
+  if ($ts.TotalHours -ge 1) {
+    return '{0:00}:{1:00}:{2:00}' -f [int]$ts.TotalHours, $ts.Minutes, $ts.Seconds
+  }
+  return '{0:00}:{1:00}' -f [int]$ts.TotalMinutes, $ts.Seconds
+}
+
+function Parse-DateSafe([string]$value) {
+  if (-not $value) { return $null }
+  try {
+    return [DateTime]::Parse($value, [System.Globalization.CultureInfo]::InvariantCulture, [System.Globalization.DateTimeStyles]::RoundtripKind)
+  }
+  catch {
+    return $null
+  }
+}
+
 function Get-ScenarioExampleOrder([string]$featurePath, [string]$scenarioTitle) {
   $order = @{}
   if (-not (Test-Path $featurePath)) { return $order }
@@ -81,6 +114,13 @@ $rows = foreach ($r in $doc.SelectNodes('//t:UnitTestResult', $ns)) {
     if ($r.Output -and $r.Output.StdOut) { $stdout = "$($r.Output.StdOut)" }
   $cleanName = $r.testName -replace ',\s*null\)', ')'
 
+  $durationSeconds = ConvertTo-Seconds "$($r.duration)"
+  $startTime = Parse-DateSafe "$($r.startTime)"
+  $endTime = Parse-DateSafe "$($r.endTime)"
+  if ($null -eq $durationSeconds -and $startTime -and $endTime) {
+    $durationSeconds = [double]($endTime - $startTime).TotalSeconds
+  }
+
   $scenarioKey = ''
   $scenarioName = 'Other'
   $input1 = ''
@@ -121,6 +161,9 @@ $rows = foreach ($r in $doc.SelectNodes('//t:UnitTestResult', $ns)) {
     Input2       = $input2
     Expected     = $expected
     ExampleOrder = $exampleOrder
+    DurationSecs = $durationSeconds
+    StartTime    = $startTime
+    EndTime      = $endTime
     }
 }
 
@@ -131,6 +174,51 @@ $other     = $total - $passed - $failed
 $passRate  = if ($total -gt 0) { [math]::Round(($passed / $total) * 100) } else { 0 }
 $generated = Get-Date -Format 'dd MMM yyyy  HH:mm:ss'
 $missingCount = if ($expectedTotal -gt $total) { $expectedTotal - $total } else { 0 }
+
+$runStart = $null
+$runEnd = $null
+$timesNode = $doc.SelectSingleNode('//t:TestRun/t:Times', $ns)
+if ($timesNode) {
+  $runStart = Parse-DateSafe "$($timesNode.start)"
+  $runEnd = Parse-DateSafe "$($timesNode.finish)"
+}
+
+$totalSeconds = $null
+if ($runStart -and $runEnd) {
+  $totalSeconds = [double]($runEnd - $runStart).TotalSeconds
+}
+if ($null -eq $totalSeconds) {
+  $totalSeconds = [double](($rows | Where-Object { $_.DurationSecs -ne $null } | Measure-Object -Property DurationSecs -Sum).Sum)
+}
+$totalExecutionTime = Format-Duration $totalSeconds
+
+$scenarioStats = foreach ($scenario in $scenarioOrder) {
+  $scenarioRows = @($rows | Where-Object { $_.ScenarioName -eq $scenario })
+  if ($scenarioRows.Count -eq 0) { continue }
+  $scenarioDurationSecs = [double](($scenarioRows | Where-Object { $_.DurationSecs -ne $null } | Measure-Object -Property DurationSecs -Sum).Sum)
+  [PSCustomObject]@{
+    Scenario = $scenario
+    Total = $scenarioRows.Count
+    Passed = @($scenarioRows | Where-Object { $_.Outcome -eq 'Passed' }).Count
+    Failed = @($scenarioRows | Where-Object { $_.Outcome -eq 'Failed' }).Count
+    Duration = (Format-Duration $scenarioDurationSecs)
+  }
+}
+
+$timedRows = @($rows | Where-Object { $_.StartTime -and $_.EndTime } | Sort-Object StartTime)
+$hasOverlap = $false
+if ($timedRows.Count -gt 1) {
+  $maxEnd = $timedRows[0].EndTime
+  for ($idx = 1; $idx -lt $timedRows.Count; $idx++) {
+    $current = $timedRows[$idx]
+    if ($current.StartTime -lt $maxEnd) {
+      $hasOverlap = $true
+      break
+    }
+    if ($current.EndTime -gt $maxEnd) { $maxEnd = $current.EndTime }
+  }
+}
+$observedExecutionMode = if ($hasOverlap) { 'Parallelizable (overlap observed)' } else { 'NonParallelizable / Sequential (no overlap observed)' }
 
 function HtmlEncode([string]$s) {
     if (-not $s) { return '' }
@@ -205,7 +293,7 @@ $html = @"
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Anagram Test Report</title>
+  <title>SMBC - Anagram Checker Test Report</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#333}
@@ -276,12 +364,22 @@ $html = @"
     .s-time {color:#9ca3af;font-size:.72rem;font-weight:400}
     .s-errmsg{font-size:.78rem;color:#dc2626;background:#fef2f2;border-radius:4px;
               padding:4px 8px;margin-top:4px;font-family:'Cascadia Code','Consolas',monospace}
+
+    .exec-wrap{margin:0 40px 24px;background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);overflow:hidden}
+    .exec-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px 18px;border-bottom:1px solid #eef2f7}
+    .exec-item{background:#f8f9fc;border:1px solid #e7ecf3;border-radius:8px;padding:10px 12px}
+    .exec-key{font-size:.72rem;text-transform:uppercase;color:#708090;letter-spacing:.6px}
+    .exec-val{font-size:.9rem;color:#1f2a37;margin-top:3px;font-weight:600}
+    .scenario-time{width:100%;border-collapse:collapse}
+    .scenario-time th,.scenario-time td{padding:10px 14px;border-bottom:1px solid #f0f2f5;font-size:.82rem;text-align:left}
+    .scenario-time th{background:#f7f9fc;color:#4d5b6a;text-transform:uppercase;letter-spacing:.6px;font-size:.72rem}
+    .scenario-time tr:last-child td{border-bottom:none}
   </style>
 </head>
 <body>
 
   <div class="header">
-    <h1>Anagram <span>Test Report</span></h1>
+    <h1>SMBC - Anagram Checker <span>Test Report</span></h1>
     <div class="meta">
       <div>Generated: $generated</div>
       <div>Framework: SpecFlow + NUnit</div>
@@ -298,6 +396,31 @@ $html = @"
   <div class="progress-wrap">
     <div class="progress-bar"><div class="progress-fill" style="width:$passRate%"></div></div>
     <div class="progress-label">$passRate% pass rate</div>
+  </div>
+
+  <div class="exec-wrap">
+    <div class="exec-grid">
+      <div class="exec-item">
+        <div class="exec-key">Observed Mode</div>
+        <div class="exec-val">$(HtmlEncode $observedExecutionMode)</div>
+      </div>
+      <div class="exec-item">
+        <div class="exec-key">Total Execution Time</div>
+        <div class="exec-val">$(HtmlEncode $totalExecutionTime)</div>
+      </div>
+    </div>
+    <table class="scenario-time">
+      <thead>
+        <tr><th>Scenario</th><th>Total</th><th>Passed</th><th>Failed</th><th>Execution Time</th></tr>
+      </thead>
+      <tbody>
+$(
+  ($scenarioStats | ForEach-Object {
+    "        <tr><td>$(HtmlEncode $_.Scenario)</td><td>$($_.Total)</td><td>$($_.Passed)</td><td>$($_.Failed)</td><td>$(HtmlEncode $_.Duration)</td></tr>"
+  }) -join "`n"
+)
+      </tbody>
+    </table>
   </div>
 
   $(if ($missingCount -gt 0) {

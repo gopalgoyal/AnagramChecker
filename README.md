@@ -21,7 +21,8 @@ Two words that contain the same letters in a different order.
 ```
 AnagramAutomation/
 ├── Features/
-│   └── Anagram_Checker.feature      ← Define tests here (plain English)
+│   ├── Anagram_Checker.feature                  ← `@anagram` scenario outline (logic)
+│   └── Anagram _Checker_APIValidation.feature   ← `@api` + `@anagram` scenario outline (API)
 ├── Steps/
 │   ├── AnagramSteps.cs              ← Runs the anagram logic tests
 │   └── ApiSteps.cs                  ← Runs the API tests
@@ -59,10 +60,21 @@ powershell -ExecutionPolicy Bypass -File AnagramAutomation/scripts/run-tests.ps1
 This automatically:
 1. Kills any leftover process on port 5000
 2. Starts the AnagramWebValidator service and waits until it's ready
-3. Runs all 9 tests
+3. Runs tests (all by default)
 4. Stops the AnagramWebValidator service
 5. Generates the HTML report
 6. Opens the report in your browser
+
+### Run by tag (optional)
+
+From the workspace root:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File AnagramAutomation/scripts/run-tests.ps1 -Tag anagram
+powershell -ExecutionPolicy Bypass -File AnagramAutomation/scripts/run-tests.ps1 -Tag api
+```
+
+You can pass tag names with or without `@` (for example `api` or `@api`).
 
 ### Option 2 — VS Code keyboard shortcut
 
@@ -76,7 +88,7 @@ Click the flask icon in the sidebar. The `anagram.runsettings` file ensures Anag
 
 ## Tests
 
-There are **9 tests** in total:
+There are **16 tests** in total:
 
 ### Scenario Outline — 8 tests (anagram logic)
 
@@ -93,9 +105,13 @@ Defined in `Features/Anagram_Checker.feature`:
 | apple | paple | true |
 | rat | car | false |
 
-### Scenario — 1 test (API)
+Tag: `@anagram`
 
-Posts `listen` / `silent` to `POST /api/anagram` on the AnagramWebValidator service and verifies the response field `isAnagram` is `true`.
+### Scenario Outline — 8 tests (API)
+
+Defined in `Features/Anagram _Checker_APIValidation.feature`.
+
+Tags: `@anagram`, `@api`
 
 ---
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Anagram Test Report</title>
+  <title>SMBC - Anagram Checker Test Report</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#333}
@@ -73,14 +73,24 @@
     .s-time {color:#9ca3af;font-size:.72rem;font-weight:400}
     .s-errmsg{font-size:.78rem;color:#dc2626;background:#fef2f2;border-radius:4px;
               padding:4px 8px;margin-top:4px;font-family:'Cascadia Code','Consolas',monospace}
+
+    .exec-wrap{margin:0 40px 24px;background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);overflow:hidden}
+    .exec-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px 18px;border-bottom:1px solid #eef2f7}
+    .exec-item{background:#f8f9fc;border:1px solid #e7ecf3;border-radius:8px;padding:10px 12px}
+    .exec-key{font-size:.72rem;text-transform:uppercase;color:#708090;letter-spacing:.6px}
+    .exec-val{font-size:.9rem;color:#1f2a37;margin-top:3px;font-weight:600}
+    .scenario-time{width:100%;border-collapse:collapse}
+    .scenario-time th,.scenario-time td{padding:10px 14px;border-bottom:1px solid #f0f2f5;font-size:.82rem;text-align:left}
+    .scenario-time th{background:#f7f9fc;color:#4d5b6a;text-transform:uppercase;letter-spacing:.6px;font-size:.72rem}
+    .scenario-time tr:last-child td{border-bottom:none}
   </style>
 </head>
 <body>
 
   <div class="header">
-    <h1>Anagram <span>Test Report</span></h1>
+    <h1>SMBC - Anagram Checker <span>Test Report</span></h1>
     <div class="meta">
-      <div>Generated: 20 Feb 2026  00:00:35</div>
+      <div>Generated: 20 Feb 2026  20:57:03</div>
       <div>Framework: SpecFlow + NUnit</div>
     </div>
   </div>
@@ -95,6 +105,28 @@
   <div class="progress-wrap">
     <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
     <div class="progress-label">100% pass rate</div>
+  </div>
+
+  <div class="exec-wrap">
+    <div class="exec-grid">
+      <div class="exec-item">
+        <div class="exec-key">Observed Mode</div>
+        <div class="exec-val">Parallelizable (overlap observed)</div>
+      </div>
+      <div class="exec-item">
+        <div class="exec-key">Total Execution Time</div>
+        <div class="exec-val">18.00s</div>
+      </div>
+    </div>
+    <table class="scenario-time">
+      <thead>
+        <tr><th>Scenario</th><th>Total</th><th>Passed</th><th>Failed</th><th>Execution Time</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Check if two strings are anagrams</td><td>8</td><td>8</td><td>0</td><td>0.00s</td></tr>
+        <tr><td>Validate via API if two strings are anagrams</td><td>8</td><td>8</td><td>0</td><td>17.00s</td></tr>
+      </tbody>
+    </table>
   </div>
 
   
@@ -181,7 +213,7 @@
           <td>elegant man</td>
           <td>true</td>
           <td style="white-space:nowrap"><span class="badge badge-pass">Passed</span></td>
-          <td><details class='steps'><summary>Steps</summary><div class='steps-block'><div class='step step-given'><span class='s-ok'>&#10003;</span> <strong>Given</strong> a running Anagram API at &quot;http://localhost:5000&quot; <span class='s-time'>(0.0s)</span></div><div class='step step-when'><span class='s-ok'>&#10003;</span> <strong>When</strong> I POST to &quot;/api/anagram&quot; with payload strings &quot;a gentleman&quot; and &quot;elegant man&quot; <span class='s-time'>(2.1s)</span></div><div class='step step-then'><span class='s-ok'>&#10003;</span> <strong>Then</strong> the API response field &quot;isAnagram&quot; should be &quot;true&quot; <span class='s-time'>(0.0s)</span></div></div></details></td>
+          <td><details class='steps'><summary>Steps</summary><div class='steps-block'><div class='step step-given'><span class='s-ok'>&#10003;</span> <strong>Given</strong> a running Anagram API at &quot;http://localhost:5000&quot; <span class='s-time'>(0.0s)</span></div><div class='step step-when'><span class='s-ok'>&#10003;</span> <strong>When</strong> I POST to &quot;/api/anagram&quot; with payload strings &quot;a gentleman&quot; and &quot;elegant man&quot; <span class='s-time'>(2.0s)</span></div><div class='step step-then'><span class='s-ok'>&#10003;</span> <strong>Then</strong> the API response field &quot;isAnagram&quot; should be &quot;true&quot; <span class='s-time'>(0.0s)</span></div></div></details></td>
         </tr>        <tr>
           <td style="color:#aaa;font-size:.8rem;white-space:nowrap">2</td>
           <td>apple</td>
@@ -209,14 +241,14 @@
           <td>world</td>
           <td>false</td>
           <td style="white-space:nowrap"><span class="badge badge-pass">Passed</span></td>
-          <td><details class='steps'><summary>Steps</summary><div class='steps-block'><div class='step step-given'><span class='s-ok'>&#10003;</span> <strong>Given</strong> a running Anagram API at &quot;http://localhost:5000&quot; <span class='s-time'>(0.0s)</span></div><div class='step step-when'><span class='s-ok'>&#10003;</span> <strong>When</strong> I POST to &quot;/api/anagram&quot; with payload strings &quot;hello&quot; and &quot;world&quot; <span class='s-time'>(2.1s)</span></div><div class='step step-then'><span class='s-ok'>&#10003;</span> <strong>Then</strong> the API response field &quot;isAnagram&quot; should be &quot;false&quot; <span class='s-time'>(0.0s)</span></div></div></details></td>
+          <td><details class='steps'><summary>Steps</summary><div class='steps-block'><div class='step step-given'><span class='s-ok'>&#10003;</span> <strong>Given</strong> a running Anagram API at &quot;http://localhost:5000&quot; <span class='s-time'>(0.0s)</span></div><div class='step step-when'><span class='s-ok'>&#10003;</span> <strong>When</strong> I POST to &quot;/api/anagram&quot; with payload strings &quot;hello&quot; and &quot;world&quot; <span class='s-time'>(2.0s)</span></div><div class='step step-then'><span class='s-ok'>&#10003;</span> <strong>Then</strong> the API response field &quot;isAnagram&quot; should be &quot;false&quot; <span class='s-time'>(0.0s)</span></div></div></details></td>
         </tr>        <tr>
           <td style="color:#aaa;font-size:.8rem;white-space:nowrap">6</td>
           <td>listen</td>
           <td>silent</td>
           <td>true</td>
           <td style="white-space:nowrap"><span class="badge badge-pass">Passed</span></td>
-          <td><details class='steps'><summary>Steps</summary><div class='steps-block'><div class='step step-given'><span class='s-ok'>&#10003;</span> <strong>Given</strong> a running Anagram API at &quot;http://localhost:5000&quot; <span class='s-time'>(0.0s)</span></div><div class='step step-when'><span class='s-ok'>&#10003;</span> <strong>When</strong> I POST to &quot;/api/anagram&quot; with payload strings &quot;listen&quot; and &quot;silent&quot; <span class='s-time'>(2.2s)</span></div><div class='step step-then'><span class='s-ok'>&#10003;</span> <strong>Then</strong> the API response field &quot;isAnagram&quot; should be &quot;true&quot; <span class='s-time'>(0.0s)</span></div></div></details></td>
+          <td><details class='steps'><summary>Steps</summary><div class='steps-block'><div class='step step-given'><span class='s-ok'>&#10003;</span> <strong>Given</strong> a running Anagram API at &quot;http://localhost:5000&quot; <span class='s-time'>(0.0s)</span></div><div class='step step-when'><span class='s-ok'>&#10003;</span> <strong>When</strong> I POST to &quot;/api/anagram&quot; with payload strings &quot;listen&quot; and &quot;silent&quot; <span class='s-time'>(2.3s)</span></div><div class='step step-then'><span class='s-ok'>&#10003;</span> <strong>Then</strong> the API response field &quot;isAnagram&quot; should be &quot;true&quot; <span class='s-time'>(0.0s)</span></div></div></details></td>
         </tr>        <tr>
           <td style="color:#aaa;font-size:.8rem;white-space:nowrap">7</td>
           <td>rat</td>
